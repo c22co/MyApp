@@ -8,7 +8,7 @@ export default function App() {
       <Text>Ready to track your assignments!</Text>
     </View>
   );
-}
+} 
 
 const styles = StyleSheet.create({
   container: {
