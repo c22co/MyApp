@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from "expo-status-bar";
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { 
-  Text,  
+  Text, 
   View, 
   ScrollView, 
   TouchableOpacity, 
+  SafeAreaView,
   Alert,
   TextInput,
   Modal,
@@ -39,8 +39,6 @@ interface Subject {
 
 export default function App() {
 
-  const insets = useSafeAreaInsets();
-
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [subjectDetailVisible, setSubjectDetailVisible] = useState(false);
@@ -62,7 +60,6 @@ export default function App() {
   // Animated value for modal fade
   const fadeAnim = useState(new Animated.Value(0))[0];
 
-  
   // Calculate subject grade based on category weights
   const calculateSubjectGrade = (subject: Subject): number => {
     const categoryTotals = { KU: 0, A: 0, TI: 0, C: 0 };
@@ -86,9 +83,7 @@ export default function App() {
     });
 
     return totalWeight > 0 ? Math.round(weightedTotal) : 0;
-    
   };
-
 
   // calculate semester progress
   const calculateSemesterProgress = (): number => {
@@ -315,7 +310,7 @@ export default function App() {
     setNewAssignmentCategory('KU');
   };
 
-    // Load saved data when app starts
+  // Load saved data when app starts
   useEffect(() => {
     loadSavedData();
   }, []); // Empty array means this runs only once when app starts
@@ -356,7 +351,7 @@ export default function App() {
     // Make sure the top-level SafeAreaView has a consistent background color
     <SafeAreaView style={styles.container}>
       {/* Set the status bar style for iOS (it handles dark/light content) */}
-      <StatusBar style="light" translucent={true} />
+      <StatusBar style="light" backgroundColor="#1b4965" translucent={false}/>
 
       {isFirstTime ? (
         // Welcome Screen
@@ -428,12 +423,10 @@ export default function App() {
             </View>
           </View>
         </View>
-
-        
       ) : !subjectDetailVisible ? (
-        // Your existing main screen code stays exactly the same
+        // Main screen
         <>
-          <View style={[styles.header, { paddingTop: insets.top }]}>
+          <View style={styles.header}>
             <Text style={[styles.overallGrade, { color: '#fff' }]}>
               {overallAverage}%
             </Text>
@@ -449,10 +442,8 @@ export default function App() {
             </View>
           </View>
 
-          {/* Rest of your existing main screen code... */}
           <ScrollView style={styles.subjectsList} showsVerticalScrollIndicator={false}>
             <Text style={styles.sectionTitle}>Subjects</Text>
-            
             {subjects.length === 0 ? (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyText}>No subjects added yet</Text>
@@ -482,7 +473,6 @@ export default function App() {
             )}
           </ScrollView>
 
-          {/* reset button */}
           {subjects.length < 4 && (
             <>
               <TouchableOpacity 
@@ -492,7 +482,6 @@ export default function App() {
                 <Text style={styles.floatingButtonText}>+</Text>
               </TouchableOpacity>
 
-              {/* FAB Options Modal */}
               <Modal 
                 transparent 
                 visible={showFabOptions} 
@@ -514,7 +503,6 @@ export default function App() {
                     >
                       <Text style={styles.fabOptionText}>➕ Add Subject</Text>
                     </TouchableOpacity>
-
                     <TouchableOpacity 
                       style={[styles.fabOptionButton, { backgroundColor: '#62b6cb' }]} 
                       onPress={() => {
@@ -529,7 +517,6 @@ export default function App() {
                               style: 'destructive',
                               onPress: async () => {
                                 await clearAllData();
-                                // Reset all state
                                 setIsFirstTime(true);
                                 setUserName('');
                                 setSemesterStartDate('');
@@ -549,8 +536,6 @@ export default function App() {
               </Modal>
             </>
           )}
-
-
 
           <Modal transparent visible={modalVisible} onRequestClose={closeModal}>
             <Animated.View style={[styles.modalOverlay, { opacity: fadeAnim }]}>
@@ -576,7 +561,6 @@ export default function App() {
           </Modal>
         </>
       ) : (
-        // Your existing subject detail screen code stays exactly the same
         selectedSubject && (
           <>
             <View style={styles.detailHeader}>
@@ -589,138 +573,131 @@ export default function App() {
               </View>
             </View>
 
-            {/* Rest of your existing subject detail code... */}
-            <ScrollView style={styles.detailContent}>
-              <Text style={styles.sectionTitle}>Category Weights</Text>
-              {Object.entries(selectedSubject.categoryWeights).map(([category, weight]) => (
-                <View key={category} style={styles.weightRow}>
-                  <Text style={styles.categoryLabel}>{category}:</Text>
+              <ScrollView style={styles.assignmentsSection}>
+              <Text style={styles.sectionTitle}>Assignments</Text>
+              {(['KU', 'A', 'TI', 'C'] as const).map(category => {
+                const categoryAssignments = selectedSubject.assignments.filter(a => a.category === category);
+                const categoryTotal = categoryAssignments.reduce((sum, a) => sum + a.grade, 0);
+                const categoryMaxTotal = categoryAssignments.reduce((sum, a) => sum + a.maxGrade, 0);
+                const categoryPercentage = categoryMaxTotal > 0 ? Math.round((categoryTotal / categoryMaxTotal) * 100) : 0;
+
+                return (
+                  <View key={category} style={styles.categorySection}>
+                    <View style={styles.categoryHeader}>
+                      <Text style={styles.categoryTitle}>{category}</Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 8 }}>
+                        <TextInput
+                          style={[styles.weightInput, { width: 60,  }]}
+                          value={selectedSubject.categoryWeights[category].toString()}
+                          onChangeText={text => {
+                            const weightNum = parseInt(text) || 0;
+                            updateCategoryWeight(category, weightNum);
+                          }}
+                          keyboardType="numeric"
+                          maxLength={3}
+                        />
+                        <Text style={styles.percentText}>%</Text>
+                      </View>
+                      <View style={[styles.categoryGradeChip, { backgroundColor: getGradeColor(categoryPercentage), marginLeft: 8 }]}>
+                        <Text style={styles.categoryGradeText}>
+                          {categoryMaxTotal > 0 ? `${categoryPercentage}%` : 'N/A'}
+                        </Text>
+                      </View>
+                    </View>
+                    {categoryAssignments.length === 0 ? (
+                      <Text style={styles.noAssignmentsText}>No assignments in this category</Text>
+                    ) : (
+                      categoryAssignments.map((assignment) => (
+                        <View key={assignment.id} style={styles.assignmentItem}>
+                          <Text style={styles.assignmentName}>{assignment.name}</Text>
+                          <Text style={styles.assignmentGrade}>
+                            {assignment.grade}/{assignment.maxGrade} ({Math.round((assignment.grade/assignment.maxGrade)*100)}%)
+                          </Text>
+                        </View>
+                      ))
+                    )}
+                  </View>
+                );
+              })}
+              <TouchableOpacity
+                style={styles.addAssignmentButton}
+                onPress={() => setAddAssignmentModalVisible(true)}
+              >
+                <Text style={styles.addAssignmentText}>+ Add Assignment</Text>
+              </TouchableOpacity>
+            </ScrollView>
+
+            <Modal visible={addAssignmentModalVisible} transparent onRequestClose={() => setAddAssignmentModalVisible(false)}>
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalTitle}>Add Assignment</Text>
                   <TextInput
-                    style={styles.weightInput}
-                    value={weight.toString()}
-                    onChangeText={(text) => updateCategoryWeight(category as keyof CategoryWeight, parseInt(text) || 0)}
-                    keyboardType="numeric"
+                    style={styles.textInput}
+                    placeholder="Assignment name"
+                    value={newAssignmentName}
+                    onChangeText={setNewAssignmentName}
                     onBlur={() => {}}
                   />
-                  <Text style={styles.percentText}>%</Text>
-                </View>
-              ))}
-
-              <View style={styles.assignmentsSection}>
-                <Text style={styles.sectionTitle}>Assignments by Category</Text>
-                {(['KU', 'A', 'TI', 'C'] as const).map(category => {
-                  const categoryAssignments = selectedSubject.assignments.filter(a => a.category === category);
-                  const categoryTotal = categoryAssignments.reduce((sum, a) => sum + a.grade, 0);
-                  const categoryMaxTotal = categoryAssignments.reduce((sum, a) => sum + a.maxGrade, 0);
-                  const categoryPercentage = categoryMaxTotal > 0 ? Math.round((categoryTotal / categoryMaxTotal) * 100) : 0;
+                  <View style={styles.gradeRow}>
+                    <TextInput
+                      style={[styles.textInput, { flex: 1, marginRight: 10 }]}
+                      placeholder="Grade"
+                      value={newAssignmentGrade}
+                      onChangeText={setNewAssignmentGrade}
+                      keyboardType="numeric"
+                      onBlur={() => {}}
+                    />
+                    <TextInput
+                      style={[styles.textInput, { flex: 1 }]}
+                      placeholder="Max grade"
+                      value={newAssignmentMaxGrade}
+                      onChangeText={setNewAssignmentMaxGrade}
+                      keyboardType="numeric"
+                      onBlur={() => {}}
+                    />
+                  </View>
                   
-      return (
-        <View key={category} style={styles.categorySection}>
-          <View style={styles.categoryHeader}>
-            <Text style={styles.categoryTitle}>{category}</Text>
-            <View style={[styles.categoryGradeChip, { backgroundColor: getGradeColor(categoryPercentage) }]}>
-              <Text style={styles.categoryGradeText}>
-                {categoryMaxTotal > 0 ? `${categoryPercentage}%` : 'N/A'}
-              </Text>
-            </View>
-          </View>
-          
-          {categoryAssignments.length === 0 ? (
-            <Text style={styles.noAssignmentsText}>No assignments in this category</Text>
-          ) : (
-            categoryAssignments.map((assignment) => (
-              <View key={assignment.id} style={styles.assignmentItem}>
-                <Text style={styles.assignmentName}>{assignment.name}</Text>
-                <Text style={styles.assignmentGrade}>
-                  {assignment.grade}/{assignment.maxGrade} ({Math.round((assignment.grade/assignment.maxGrade)*100)}%)
-                </Text>
+                  <Text style={styles.categorySelectionTitle}>Category:</Text>
+                  <View style={styles.categoryButtons}>
+                    {(['KU', 'A', 'TI', 'C'] as const).map(category => (
+                      <TouchableOpacity
+                        key={category}
+                        style={[
+                          styles.categoryButton,
+                          newAssignmentCategory === category && styles.categoryButtonSelected
+                        ]}
+                        onPress={() => setNewAssignmentCategory(category)}
+                      >
+                        <Text style={[
+                          styles.categoryButtonText,
+                          newAssignmentCategory === category && styles.categoryButtonTextSelected
+                        ]}>
+                          {category}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity 
+                      style={[styles.modalButton, styles.cancelButton]} 
+                      onPress={() => setAddAssignmentModalVisible(false)}
+                    >
+                      <Text style={styles.cancelButtonText}>Cancel</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                      style={[styles.modalButton, styles.saveButton]} 
+                      onPress={addAssignment}
+                    >
+                      <Text style={styles.saveButtonText}>Add</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
-            ))
-          )}
-        </View>
-      );
-    })}
-    
-    <TouchableOpacity 
-      style={styles.addAssignmentButton}
-      onPress={() => setAddAssignmentModalVisible(true)}
-    >
-      <Text style={styles.addAssignmentText}>+ Add Assignment</Text>
-    </TouchableOpacity>
-  </View>
-</ScrollView>
-
-<Modal visible={addAssignmentModalVisible} transparent onRequestClose={() => setAddAssignmentModalVisible(false)}>
-  <View style={styles.modalOverlay}>
-    <View style={styles.modalContent}>
-      <Text style={styles.modalTitle}>Add Assignment</Text>
-      <TextInput
-        style={styles.textInput}
-        placeholder="Assignment name"
-        value={newAssignmentName}
-        onChangeText={setNewAssignmentName}
-        onBlur={() => {}}
-      />
-      <View style={styles.gradeRow}>
-        <TextInput
-          style={[styles.textInput, { flex: 1, marginRight: 10 }]}
-          placeholder="Grade"
-          value={newAssignmentGrade}
-          onChangeText={setNewAssignmentGrade}
-          keyboardType="numeric"
-          onBlur={() => {}}
-        />
-        <TextInput
-          style={[styles.textInput, { flex: 1 }]}
-          placeholder="Max grade"
-          value={newAssignmentMaxGrade}
-          onChangeText={setNewAssignmentMaxGrade}
-          keyboardType="numeric"
-          onBlur={() => {}}
-        />
-      </View>
-      
-      <Text style={styles.categorySelectionTitle}>Category:</Text>
-      <View style={styles.categoryButtons}>
-        {(['KU', 'A', 'TI', 'C'] as const).map(category => (
-          <TouchableOpacity
-            key={category}
-            style={[
-              styles.categoryButton,
-              newAssignmentCategory === category && styles.categoryButtonSelected
-            ]}
-            onPress={() => setNewAssignmentCategory(category)}
-          >
-            <Text style={[
-              styles.categoryButtonText,
-              newAssignmentCategory === category && styles.categoryButtonTextSelected
-            ]}>
-              {category}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <View style={styles.modalButtons}>
-        <TouchableOpacity 
-          style={[styles.modalButton, styles.cancelButton]} 
-          onPress={() => setAddAssignmentModalVisible(false)}
-        >
-          <Text style={styles.cancelButtonText}>Cancel</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.modalButton, styles.saveButton]} 
-          onPress={addAssignment}
-        >
-          <Text style={styles.saveButtonText}>Add</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </View>
-</Modal>
-</>
-)
-)}
-</SafeAreaView>
-);
+            </Modal>
+          </>
+        )
+      )}
+    </SafeAreaView>
+  );
 }
