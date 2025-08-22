@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { 
-  StyleSheet, 
   Text, 
   View, 
   ScrollView, 
   TouchableOpacity, 
-  SafeAreaView,
   Alert,
   TextInput,
   Modal,
-  Animated
+  Animated,
 } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
+import { styles } from './styles';
 
 // Define types for our data
 interface Assignment {
@@ -39,30 +37,10 @@ interface Subject {
   categoryWeights: CategoryWeight;
 }
 
-const Stack = createNativeStackNavigator();
-
 export default function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="SubjectDetail" component={SubjectDetailScreen} />
-        {/* Add more screens here */}
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
 
-function SubjectDetailScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Subject Detail Screen</Text>
-    </View>
-  );
-}
+  const insets = useSafeAreaInsets();
 
-// Example screens:
-function HomeScreen({ navigation }) {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [subjectDetailVisible, setSubjectDetailVisible] = useState(false);
@@ -108,6 +86,7 @@ function HomeScreen({ navigation }) {
     });
 
     return totalWeight > 0 ? Math.round(weightedTotal) : 0;
+    
   };
 
 
@@ -246,15 +225,15 @@ function HomeScreen({ navigation }) {
       if (startDate >= endDate) {
         Alert.alert('Error', 'End date must be after start date.');
         return;
-  }
-  
-  // Save all welcome data
-  setIsFirstTime(false);
-  saveToStorage(STORAGE_KEYS.IS_FIRST_TIME, false);
-  saveToStorage(STORAGE_KEYS.USER_NAME, userName);
-  saveToStorage(STORAGE_KEYS.SEMESTER_START, semesterStartDate);
-  saveToStorage(STORAGE_KEYS.SEMESTER_END, semesterEndDate);
-}
+      }
+      
+      // Save all welcome data
+      setIsFirstTime(false);
+      saveToStorage(STORAGE_KEYS.IS_FIRST_TIME, false);
+      saveToStorage(STORAGE_KEYS.USER_NAME, userName);
+      saveToStorage(STORAGE_KEYS.SEMESTER_START, semesterStartDate);
+      saveToStorage(STORAGE_KEYS.SEMESTER_END, semesterEndDate);
+    }
   };
 
   const handleWelcomeBack = () => {
@@ -371,304 +350,373 @@ function HomeScreen({ navigation }) {
     }
   };
 
+  const [showFabOptions, setShowFabOptions] = useState(false);
+
   return (
-  <SafeAreaView style={styles.container}>
-    {isFirstTime ? (
-      // Welcome Screen
-      <View style={styles.welcomeContainer}>
-        <View style={styles.welcomeContent}>
-          {welcomeStep === 1 && (
-            <>
-              <Text style={styles.welcomeTitle}>Hello! 👋</Text>
-              <Text style={styles.welcomeSubtitle}>Welcome to Grade Tracker</Text>
-              <Text style={styles.welcomeText}>Let's get you set up! First, what's your name?</Text>
-              <TextInput
-                style={styles.welcomeInput}
-                placeholder="Enter your name"
-                value={userName}
-                onChangeText={setUserName}
-                autoFocus={true}
-              />
-            </>
-          )}
-          
-          {welcomeStep === 2 && (
-            <>
-              <Text style={styles.welcomeTitle}>Hi {userName}! 😊</Text>
-              <Text style={styles.welcomeText}>When does your semester start?</Text>
-              <Text style={styles.dateHelper}>Format: YYYY-MM-DD (e.g., 2024-09-01)</Text>
-              <TextInput
-                style={styles.welcomeInput}
-                placeholder="2024-09-01"
-                value={semesterStartDate}
-                onChangeText={setSemesterStartDate}
-                autoFocus={true}
-              />
-            </>
-          )}
-          
-          {welcomeStep === 3 && (
-            <>
-              <Text style={styles.welcomeTitle}>Almost done! 🎯</Text>
-              <Text style={styles.welcomeText}>When does your semester end?</Text>
-              <Text style={styles.dateHelper}>Format: YYYY-MM-DD (e.g., 2024-12-15)</Text>
-              <TextInput
-                style={styles.welcomeInput}
-                placeholder="2024-12-15"
-                value={semesterEndDate}
-                onChangeText={setSemesterEndDate}
-                autoFocus={true}
-              />
-            </>
-          )}
-          
-          <View style={styles.welcomeButtons}>
-            {welcomeStep > 1 && (
-              <TouchableOpacity style={styles.welcomeBackButton} onPress={handleWelcomeBack}>
-                <Text style={styles.welcomeBackButtonText}>Back</Text>
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity style={styles.welcomeNextButton} onPress={handleWelcomeNext}>
-              <Text style={styles.welcomeNextButtonText}>
-                {welcomeStep === 3 ? 'Get Started!' : 'Next'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-          
-          <View style={styles.welcomeProgress}>
-            <Text style={styles.welcomeProgressText}>Step {welcomeStep} of 3</Text>
-            <View style={styles.welcomeProgressBar}>
-              <View style={[styles.welcomeProgressFill, { width: `${(welcomeStep / 3) * 100}%` }]} />
-            </View>
-          </View>
-        </View>
-      </View>
+    // Make sure the top-level SafeAreaView has a consistent background color
+    <SafeAreaView style={styles.container}>
+      {/* Set the status bar style for iOS (it handles dark/light content) */}
+      <StatusBar style="light" translucent={true} />
 
-      
-    ) : !subjectDetailVisible ? (
-      // Your existing main screen code stays exactly the same
-      <>
-        <View style={styles.header}>
-          <Text style={[styles.overallGrade, { color: '#fff' }]}>
-            {overallAverage}%
-          </Text>
-          <Text style={styles.overallLabel}>Hi {userName}! this is your overall average :) </Text>
-          
-          <View style={styles.progressContainer}>
-            <View style={styles.progressBarBackground}>
-              <View 
-                style={[styles.progressBarFill, { width: `${semesterProgress}%` }]} 
-              />
-            </View>
-            <Text style={styles.progressText}>Semester {semesterProgress}% Complete</Text>
-          </View>
-        </View>
-
-        {/* Rest of your existing main screen code... */}
-        <ScrollView style={styles.subjectsList} showsVerticalScrollIndicator={false}>
-          <Text style={styles.sectionTitle}>Subjects</Text>
-          
-          {subjects.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>No subjects added yet</Text>
-              <Text style={styles.emptySubtext}>Tap the + button to add your first subject</Text>
-            </View>
-          ) : (
-            subjects.map((subject) => {
-              const percentage = calculateSubjectGrade(subject);
-              return (
-                <TouchableOpacity 
-                  key={subject.id} 
-                  style={styles.subjectCard}
-                  onPress={() => openSubjectDetail(subject)}
-                >
-                  <View style={styles.subjectHeader}>
-                    <Text style={styles.subjectName}>{subject.name}</Text>
-                    <View style={[styles.gradeChip, { backgroundColor: getGradeColor(percentage) }]}>
-                      <Text style={styles.gradeText}>{percentage}%</Text>
-                    </View>
-                  </View>
-                  <Text style={styles.assignmentCount}>
-                    {subject.assignments.length} assignment{subject.assignments.length !== 1 ? 's' : ''}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })
-          )}
-          
-        </ScrollView>
-
-        {subjects.length < 4 && (
-          <TouchableOpacity style={styles.floatingButton} onPress={handleAddSubject}>
-            <Text style={styles.floatingButtonText}>+</Text>
-          </TouchableOpacity>
-        )}
-
-        <Modal transparent visible={modalVisible} onRequestClose={closeModal}>
-          <Animated.View style={[styles.modalOverlay, { opacity: fadeAnim }]}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Add New Subject</Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Enter subject name (e.g., English)"
-                value={newSubjectName}
-                onChangeText={setNewSubjectName}
-                autoFocus={true}
-              />
-              <View style={styles.modalButtons}>
-                <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={closeModal}>
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.modalButton, styles.saveButton]} onPress={saveSubject}>
-                  <Text style={styles.saveButtonText}>Save</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Animated.View>
-        </Modal>
-      </>
-    ) : (
-      // Your existing subject detail screen code stays exactly the same
-      selectedSubject && (
-        <>
-          <View style={styles.detailHeader}>
-            <TouchableOpacity onPress={() => setSubjectDetailVisible(false)}>
-              <Text style={styles.backButton}>← Back</Text>
-            </TouchableOpacity>
-            <Text style={styles.detailTitle}>{selectedSubject.name}</Text>
-            <View style={[styles.gradeChip, { backgroundColor: getGradeColor(calculateSubjectGrade(selectedSubject)) }]}>
-              <Text style={styles.gradeText}>{calculateSubjectGrade(selectedSubject)}%</Text>
-            </View>
-          </View>
-
-          {/* Rest of your existing subject detail code... */}
-          <ScrollView style={styles.detailContent}>
-            <Text style={styles.sectionTitle}>Category Weights</Text>
-            {Object.entries(selectedSubject.categoryWeights).map(([category, weight]) => (
-              <View key={category} style={styles.weightRow}>
-                <Text style={styles.categoryLabel}>{category}:</Text>
+      {isFirstTime ? (
+        // Welcome Screen
+        <View style={styles.welcomeContainer}>
+          <View style={styles.welcomeContent}>
+            {welcomeStep === 1 && (
+              <>
+                <Text style={styles.welcomeTitle}>Hello! 👋</Text>
+                <Text style={styles.welcomeSubtitle}>Welcome to Grade Tracker</Text>
+                <Text style={styles.welcomeText}>Let's get you set up! First, what's your name?</Text>
                 <TextInput
-                  style={styles.weightInput}
-                  value={weight.toString()}
-                  onChangeText={(text) => updateCategoryWeight(category as keyof CategoryWeight, parseInt(text) || 0)}
-                  keyboardType="numeric"
-                  onBlur={() => {}}
+                  style={styles.welcomeInput}
+                  placeholder="Enter your name"
+                  value={userName}
+                  onChangeText={setUserName}
+                  autoFocus={true}
                 />
-                <Text style={styles.percentText}>%</Text>
+              </>
+            )}
+            
+            {welcomeStep === 2 && (
+              <>
+                <Text style={styles.welcomeTitle}>Hi {userName}! 😊</Text>
+                <Text style={styles.welcomeText}>When does your semester start?</Text>
+                <Text style={styles.dateHelper}>Format: YYYY-MM-DD (e.g., 2024-09-01)</Text>
+                <TextInput
+                  style={styles.welcomeInput}
+                  placeholder="2024-09-01"
+                  value={semesterStartDate}
+                  onChangeText={setSemesterStartDate}
+                  autoFocus={true}
+                />
+              </>
+            )}
+            
+            {welcomeStep === 3 && (
+              <>
+                <Text style={styles.welcomeTitle}>Almost done! 🎯</Text>
+                <Text style={styles.welcomeText}>When does your semester end?</Text>
+                <Text style={styles.dateHelper}>Format: YYYY-MM-DD (e.g., 2024-12-15)</Text>
+                <TextInput
+                  style={styles.welcomeInput}
+                  placeholder="2024-12-15"
+                  value={semesterEndDate}
+                  onChangeText={setSemesterEndDate}
+                  autoFocus={true}
+                />
+              </>
+            )}
+            
+            <View style={styles.welcomeButtons}>
+              {welcomeStep > 1 && (
+                <TouchableOpacity style={styles.welcomeBackButton} onPress={handleWelcomeBack}>
+                  <Text style={styles.welcomeBackButtonText}>Back</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity style={styles.welcomeNextButton} onPress={handleWelcomeNext}>
+                <Text style={styles.welcomeNextButtonText}>
+                  {welcomeStep === 3 ? 'Get Started!' : 'Next'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.welcomeProgress}>
+              <Text style={styles.welcomeProgressText}>Step {welcomeStep} of 3</Text>
+              <View style={styles.welcomeProgressBar}>
+                <View style={[styles.welcomeProgressFill, { width: `${(welcomeStep / 3) * 100}%` }]} />
               </View>
-            ))}
-
-            <View style={styles.assignmentsSection}>
-              <Text style={styles.sectionTitle}>Assignments by Category</Text>
-              {(['KU', 'A', 'TI', 'C'] as const).map(category => {
-                const categoryAssignments = selectedSubject.assignments.filter(a => a.category === category);
-                const categoryTotal = categoryAssignments.reduce((sum, a) => sum + a.grade, 0);
-                const categoryMaxTotal = categoryAssignments.reduce((sum, a) => sum + a.maxGrade, 0);
-                const categoryPercentage = categoryMaxTotal > 0 ? Math.round((categoryTotal / categoryMaxTotal) * 100) : 0;
-                
-    return (
-      <View key={category} style={styles.categorySection}>
-        <View style={styles.categoryHeader}>
-          <Text style={styles.categoryTitle}>{category}</Text>
-          <View style={[styles.categoryGradeChip, { backgroundColor: getGradeColor(categoryPercentage) }]}>
-            <Text style={styles.categoryGradeText}>
-              {categoryMaxTotal > 0 ? `${categoryPercentage}%` : 'N/A'}
-            </Text>
+            </View>
           </View>
         </View>
+
         
-        {categoryAssignments.length === 0 ? (
-          <Text style={styles.noAssignmentsText}>No assignments in this category</Text>
-        ) : (
-          categoryAssignments.map((assignment) => (
-            <View key={assignment.id} style={styles.assignmentItem}>
-              <Text style={styles.assignmentName}>{assignment.name}</Text>
-              <Text style={styles.assignmentGrade}>
-                {assignment.grade}/{assignment.maxGrade} ({Math.round((assignment.grade/assignment.maxGrade)*100)}%)
+      ) : !subjectDetailVisible ? (
+        // Your existing main screen code stays exactly the same
+        <>
+          <View style={[styles.header, { paddingTop: insets.top }]}>
+            <Text style={[styles.overallGrade, { color: '#fff' }]}>
+              {overallAverage}%
+            </Text>
+            <Text style={styles.overallLabel}>Hi {userName}! this is your overall average :) </Text>
+            
+            <View style={styles.progressContainer}>
+              <View style={styles.progressBarBackground}>
+                <View 
+                  style={[styles.progressBarFill, { width: `${semesterProgress}%` }]} 
+                />
+              </View>
+              <Text style={styles.progressText}>Semester {semesterProgress}% Complete</Text>
+            </View>
+          </View>
+
+          {/* Rest of your existing main screen code... */}
+          <ScrollView style={styles.subjectsList} showsVerticalScrollIndicator={false}>
+            <Text style={styles.sectionTitle}>Subjects</Text>
+            
+            {subjects.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyText}>No subjects added yet</Text>
+                <Text style={styles.emptySubtext}>Tap the + button to add your first subject</Text>
+              </View>
+            ) : (
+              subjects.map((subject) => {
+                const percentage = calculateSubjectGrade(subject);
+                return (
+                  <TouchableOpacity 
+                    key={subject.id} 
+                    style={styles.subjectCard}
+                    onPress={() => openSubjectDetail(subject)}
+                  >
+                    <View style={styles.subjectHeader}>
+                      <Text style={styles.subjectName}>{subject.name}</Text>
+                      <View style={[styles.gradeChip, { backgroundColor: getGradeColor(percentage) }]}>
+                        <Text style={styles.gradeText}>{percentage}%</Text>
+                      </View>
+                    </View>
+                    <Text style={styles.assignmentCount}>
+                      {subject.assignments.length} assignment{subject.assignments.length !== 1 ? 's' : ''}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })
+            )}
+          </ScrollView>
+
+          {/* reset button */}
+          {subjects.length < 4 && (
+            <>
+              <TouchableOpacity 
+                style={styles.floatingButton} 
+                onPress={() => setShowFabOptions(true)}
+              >
+                <Text style={styles.floatingButtonText}>+</Text>
+              </TouchableOpacity>
+
+              {/* FAB Options Modal */}
+              <Modal 
+                transparent 
+                visible={showFabOptions} 
+                animationType="fade"
+                onRequestClose={() => setShowFabOptions(false)}
+              >
+                <TouchableOpacity 
+                  style={styles.fabOverlay} 
+                  activeOpacity={1} 
+                  onPressOut={() => setShowFabOptions(false)}
+                >
+                  <View style={styles.fabOptions}>
+                    <TouchableOpacity 
+                      style={styles.fabOptionButton} 
+                      onPress={() => {
+                        setShowFabOptions(false);
+                        handleAddSubject();
+                      }}
+                    >
+                      <Text style={styles.fabOptionText}>➕ Add Subject</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                      style={[styles.fabOptionButton, { backgroundColor: '#62b6cb' }]} 
+                      onPress={() => {
+                        setShowFabOptions(false);
+                        Alert.alert(
+                          'Reset App',
+                          'This will delete all your data. Are you sure?',
+                          [
+                            { text: 'Cancel', style: 'cancel' },
+                            { 
+                              text: 'Reset', 
+                              style: 'destructive',
+                              onPress: async () => {
+                                await clearAllData();
+                                // Reset all state
+                                setIsFirstTime(true);
+                                setUserName('');
+                                setSemesterStartDate('');
+                                setSemesterEndDate('');
+                                setSubjects([]);
+                                setWelcomeStep(1);
+                              }
+                            }
+                          ]
+                        );
+                      }}
+                    >
+                      <Text style={[styles.fabOptionText, { color: '#fff' }]}>🔄 Reset App</Text>
+                    </TouchableOpacity>
+                  </View>
+                </TouchableOpacity>
+              </Modal>
+            </>
+          )}
+
+
+
+          <Modal transparent visible={modalVisible} onRequestClose={closeModal}>
+            <Animated.View style={[styles.modalOverlay, { opacity: fadeAnim }]}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Add New Subject</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Enter subject name (e.g., English)"
+                  value={newSubjectName}
+                  onChangeText={setNewSubjectName}
+                  autoFocus={true}
+                />
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={closeModal}>
+                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.modalButton, styles.saveButton]} onPress={saveSubject}>
+                    <Text style={styles.saveButtonText}>Save</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Animated.View>
+          </Modal>
+        </>
+      ) : (
+        // Your existing subject detail screen code stays exactly the same
+        selectedSubject && (
+          <>
+            <View style={styles.detailHeader}>
+              <TouchableOpacity onPress={() => setSubjectDetailVisible(false)}>
+                <Text style={styles.backButton}>← Back</Text>
+              </TouchableOpacity>
+              <Text style={styles.detailTitle}>{selectedSubject.name}</Text>
+              <View style={[styles.gradeChip, { backgroundColor: getGradeColor(calculateSubjectGrade(selectedSubject)) }]}>
+                <Text style={styles.gradeText}>{calculateSubjectGrade(selectedSubject)}%</Text>
+              </View>
+            </View>
+
+            {/* Rest of your existing subject detail code... */}
+            <ScrollView style={styles.detailContent}>
+              <Text style={styles.sectionTitle}>Category Weights</Text>
+              {Object.entries(selectedSubject.categoryWeights).map(([category, weight]) => (
+                <View key={category} style={styles.weightRow}>
+                  <Text style={styles.categoryLabel}>{category}:</Text>
+                  <TextInput
+                    style={styles.weightInput}
+                    value={weight.toString()}
+                    onChangeText={(text) => updateCategoryWeight(category as keyof CategoryWeight, parseInt(text) || 0)}
+                    keyboardType="numeric"
+                    onBlur={() => {}}
+                  />
+                  <Text style={styles.percentText}>%</Text>
+                </View>
+              ))}
+
+              <View style={styles.assignmentsSection}>
+                <Text style={styles.sectionTitle}>Assignments by Category</Text>
+                {(['KU', 'A', 'TI', 'C'] as const).map(category => {
+                  const categoryAssignments = selectedSubject.assignments.filter(a => a.category === category);
+                  const categoryTotal = categoryAssignments.reduce((sum, a) => sum + a.grade, 0);
+                  const categoryMaxTotal = categoryAssignments.reduce((sum, a) => sum + a.maxGrade, 0);
+                  const categoryPercentage = categoryMaxTotal > 0 ? Math.round((categoryTotal / categoryMaxTotal) * 100) : 0;
+                  
+      return (
+        <View key={category} style={styles.categorySection}>
+          <View style={styles.categoryHeader}>
+            <Text style={styles.categoryTitle}>{category}</Text>
+            <View style={[styles.categoryGradeChip, { backgroundColor: getGradeColor(categoryPercentage) }]}>
+              <Text style={styles.categoryGradeText}>
+                {categoryMaxTotal > 0 ? `${categoryPercentage}%` : 'N/A'}
               </Text>
             </View>
-          ))
-        )}
-      </View>
-    );
-  })}
-  
-  <TouchableOpacity 
-    style={styles.addAssignmentButton}
-    onPress={() => setAddAssignmentModalVisible(true)}
-  >
-    <Text style={styles.addAssignmentText}>+ Add Assignment</Text>
-  </TouchableOpacity>
-</View>
+          </View>
+          
+          {categoryAssignments.length === 0 ? (
+            <Text style={styles.noAssignmentsText}>No assignments in this category</Text>
+          ) : (
+            categoryAssignments.map((assignment) => (
+              <View key={assignment.id} style={styles.assignmentItem}>
+                <Text style={styles.assignmentName}>{assignment.name}</Text>
+                <Text style={styles.assignmentGrade}>
+                  {assignment.grade}/{assignment.maxGrade} ({Math.round((assignment.grade/assignment.maxGrade)*100)}%)
+                </Text>
+              </View>
+            ))
+          )}
+        </View>
+      );
+    })}
+    
+    <TouchableOpacity 
+      style={styles.addAssignmentButton}
+      onPress={() => setAddAssignmentModalVisible(true)}
+    >
+      <Text style={styles.addAssignmentText}>+ Add Assignment</Text>
+    </TouchableOpacity>
+  </View>
 </ScrollView>
 
 <Modal visible={addAssignmentModalVisible} transparent onRequestClose={() => setAddAssignmentModalVisible(false)}>
-<View style={styles.modalOverlay}>
-  <View style={styles.modalContent}>
-    <Text style={styles.modalTitle}>Add Assignment</Text>
-    <TextInput
-      style={styles.textInput}
-      placeholder="Assignment name"
-      value={newAssignmentName}
-      onChangeText={setNewAssignmentName}
-      onBlur={() => {}}
-    />
-    <View style={styles.gradeRow}>
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalContent}>
+      <Text style={styles.modalTitle}>Add Assignment</Text>
       <TextInput
-        style={[styles.textInput, { flex: 1, marginRight: 10 }]}
-        placeholder="Grade"
-        value={newAssignmentGrade}
-        onChangeText={setNewAssignmentGrade}
-        keyboardType="numeric"
+        style={styles.textInput}
+        placeholder="Assignment name"
+        value={newAssignmentName}
+        onChangeText={setNewAssignmentName}
         onBlur={() => {}}
       />
-      <TextInput
-        style={[styles.textInput, { flex: 1 }]}
-        placeholder="Max grade"
-        value={newAssignmentMaxGrade}
-        onChangeText={setNewAssignmentMaxGrade}
-        keyboardType="numeric"
-        onBlur={() => {}}
-      />
-    </View>
-    
-    <Text style={styles.categorySelectionTitle}>Category:</Text>
-    <View style={styles.categoryButtons}>
-      {(['KU', 'A', 'TI', 'C'] as const).map(category => (
-        <TouchableOpacity
-          key={category}
-          style={[
-            styles.categoryButton,
-            newAssignmentCategory === category && styles.categoryButtonSelected
-          ]}
-          onPress={() => setNewAssignmentCategory(category)}
-        >
-          <Text style={[
-            styles.categoryButtonText,
-            newAssignmentCategory === category && styles.categoryButtonTextSelected
-          ]}>
-            {category}
-          </Text>
-        </TouchableOpacity>
-      ))}
-    </View>
+      <View style={styles.gradeRow}>
+        <TextInput
+          style={[styles.textInput, { flex: 1, marginRight: 10 }]}
+          placeholder="Grade"
+          value={newAssignmentGrade}
+          onChangeText={setNewAssignmentGrade}
+          keyboardType="numeric"
+          onBlur={() => {}}
+        />
+        <TextInput
+          style={[styles.textInput, { flex: 1 }]}
+          placeholder="Max grade"
+          value={newAssignmentMaxGrade}
+          onChangeText={setNewAssignmentMaxGrade}
+          keyboardType="numeric"
+          onBlur={() => {}}
+        />
+      </View>
+      
+      <Text style={styles.categorySelectionTitle}>Category:</Text>
+      <View style={styles.categoryButtons}>
+        {(['KU', 'A', 'TI', 'C'] as const).map(category => (
+          <TouchableOpacity
+            key={category}
+            style={[
+              styles.categoryButton,
+              newAssignmentCategory === category && styles.categoryButtonSelected
+            ]}
+            onPress={() => setNewAssignmentCategory(category)}
+          >
+            <Text style={[
+              styles.categoryButtonText,
+              newAssignmentCategory === category && styles.categoryButtonTextSelected
+            ]}>
+              {category}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
-    <View style={styles.modalButtons}>
-      <TouchableOpacity 
-        style={[styles.modalButton, styles.cancelButton]} 
-        onPress={() => setAddAssignmentModalVisible(false)}
-      >
-        <Text style={styles.cancelButtonText}>Cancel</Text>
-      </TouchableOpacity>
-      <TouchableOpacity 
-        style={[styles.modalButton, styles.saveButton]} 
-        onPress={addAssignment}
-      >
-        <Text style={styles.saveButtonText}>Add</Text>
-      </TouchableOpacity>
+      <View style={styles.modalButtons}>
+        <TouchableOpacity 
+          style={[styles.modalButton, styles.cancelButton]} 
+          onPress={() => setAddAssignmentModalVisible(false)}
+        >
+          <Text style={styles.cancelButtonText}>Cancel</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.modalButton, styles.saveButton]} 
+          onPress={addAssignment}
+        >
+          <Text style={styles.saveButtonText}>Add</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   </View>
-</View>
 </Modal>
 </>
 )
@@ -676,475 +724,3 @@ function HomeScreen({ navigation }) {
 </SafeAreaView>
 );
 }
-
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    backgroundColor: '#3d466dff',
-    paddingTop: 20,
-    paddingBottom: 30,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-  },
-  overallGrade: {
-    fontSize: 72,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  overallLabel: {
-    fontSize: 16,
-    color: '#fff',
-    opacity: 0.9,
-    marginBottom: 25,
-  },
-  progressContainer: {
-    width: '80%',
-    alignItems: 'center',
-  },
-  progressLabel: {
-    fontSize: 14,
-    color: '#fff',
-    opacity: 0.9,
-    marginBottom: 8,
-  },
-  progressBarBackground: {
-    width: '100%',
-    height: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginBottom: 5,
-  },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: '#78cbe2ff',
-    borderRadius: 6,
-  },
-  progressText: {
-    fontSize: 12,
-    color: '#b1d0d8ff',
-    opacity: 0.9,
-  },
-  subjectsList: {
-    flex: 1,
-    padding: 20,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    color: '#333',
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 60,
-  },
-  emptyText: {
-    fontSize: 18,
-    color: '#666',
-    marginBottom: 8,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: '#999',
-    textAlign: 'center',
-  },
-  subjectCard: {
-    backgroundColor: '#fff',
-    padding: 16,
-    marginBottom: 12,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  subjectHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  subjectName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    flex: 1,
-  },
-  gradeChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  gradeText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  assignmentCount: {
-    fontSize: 14,
-    color: '#666',
-  },
-  floatingButton: {
-    position: 'absolute',
-    right: 20,
-    bottom: 30,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#3d466dff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  floatingButtonText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 24,
-    width: '100%',
-    maxWidth: 320,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    marginBottom: 16,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  modalButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  cancelButton: {
-    backgroundColor: '#f0f0f0',
-  },
-  saveButton: {
-    backgroundColor: '#3d466dff',
-  },
-  cancelButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#666',
-  },
-  saveButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  detailHeader: {
-    backgroundColor: '#3d466dff',
-    paddingTop: 20,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  backButton: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  detailTitle: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    flex: 1,
-    textAlign: 'center',
-  },
-  detailContent: {
-    flex: 1,
-    padding: 20,
-  },
-  weightRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-    backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 8,
-  },
-  categoryLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    width: 40,
-  },
-  weightInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 16,
-    width: 60,
-    textAlign: 'center',
-    marginLeft: 10,
-  },
-  percentText: {
-    fontSize: 16,
-    marginLeft: 8,
-    color: '#666',
-  },
-  assignmentsSection: {
-    marginTop: 20,
-  },
-  assignmentItem: {
-    backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-  assignmentName: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  categorySection: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  categoryHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-    paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  categoryTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  categoryGradeChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  categoryGradeText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  noAssignmentsText: {
-    fontSize: 14,
-    color: '#999',
-    fontStyle: 'italic',
-    textAlign: 'center',
-    paddingVertical: 12,
-  },
-  assignmentGrade: {
-    fontSize: 14,
-    color: '#666',
-  },
-  addAssignmentButton: {
-    backgroundColor: '#3d466dff',
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 12,
-  },
-  addAssignmentText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  gradeRow: {
-    flexDirection: 'row',
-  },
-  categorySelectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
-    color: '#333',
-  },
-  categoryButtons: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 16,
-  },
-  categoryButton: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderRadius: 8,
-    backgroundColor: '#f0f0f0',
-    alignItems: 'center',
-  },
-  categoryButtonSelected: {
-    backgroundColor: '#3d466dff',
-  },
-  categoryButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
-  },
-  categoryButtonTextSelected: {
-    color: '#fff',
-  },
-
-  welcomeContainer: {
-    flex: 1,
-    backgroundColor: '#667eea',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  welcomeContent: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 30,
-    width: '100%',
-    maxWidth: 350,
-    alignItems: 'center',
-  },
-  welcomeTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  welcomeSubtitle: {
-    fontSize: 18,
-    color: '#666',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  welcomeText: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 20,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  welcomeInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    fontSize: 16,
-    width: '100%',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  dateHelper: {
-    fontSize: 12,
-    color: '#999',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  welcomeButtons: {
-    flexDirection: 'row',
-    gap: 12,
-    width: '100%',
-    marginBottom: 20,
-  },
-  welcomeBackButton: {
-    flex: 1,
-    backgroundColor: '#f0f0f0',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  welcomeNextButton: {
-    flex: 1,
-    backgroundColor: '#667eea',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  welcomeBackButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#666',
-  },
-  welcomeNextButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  welcomeProgress: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  welcomeProgressText: {
-    fontSize: 12,
-    color: '#999',
-    marginBottom: 8,
-  },
-  welcomeProgressBar: {
-    width: '60%',
-    height: 6,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  welcomeProgressFill: {
-    height: '100%',
-    backgroundColor: '#667eea',
-    borderRadius: 3,
-  },
-
-  resetButton: {
-  position: 'absolute',
-  top: 50,
-  right: 20,
-  backgroundColor: '#FF3B30',
-  paddingHorizontal: 12,
-  paddingVertical: 6,
-  borderRadius: 6,
-},
-resetButtonText: {
-  color: '#fff',
-  fontSize: 12,
-  fontWeight: '600',
-},
-
-});
