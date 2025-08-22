@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -484,3 +485,491 @@ export const styles = StyleSheet.create({
   },
 
 });
+=======
+import { StyleSheet } from 'react-native';
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  header: {
+    backgroundColor: '#1b4965', 
+    paddingTop: 40, 
+    paddingBottom: 40, 
+    paddingHorizontal: 20, 
+    alignItems: 'center', 
+  },
+  overallGrade: {
+    fontSize: 72,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  overallLabel: {
+    fontSize: 16,
+    color: '#fff',
+    opacity: 0.9,
+    marginBottom: 25,
+  },
+  progressContainer: {
+    width: '80%',
+    alignItems: 'center',
+  },
+  progressLabel: {
+    fontSize: 14,
+    color: '#fff',
+    opacity: 0.9,
+    marginBottom: 8,
+  },
+  progressBarBackground: {
+    width: '100%',
+    height: 20,
+    backgroundColor: '#5fa8d3',
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginBottom: 5,
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: '#bee9e8',
+    borderRadius: 6,
+  },
+  progressText: {
+    fontSize: 12,
+    color: '#b1d0d8ff',
+    opacity: 0.9,
+  },
+  subjectsList: {
+    flex: 1,
+    padding: 20,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: '#333',
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#666',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#999',
+    textAlign: 'center',
+  },
+  subjectCard: {
+    backgroundColor: '#fff',
+    padding: 16,
+    marginBottom: 12,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  subjectHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  subjectName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    flex: 1,
+  },
+  gradeChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  gradeText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  assignmentCount: {
+    fontSize: 14,
+    color: '#666',
+  },
+  floatingButton: {
+    position: 'absolute',
+    right: 20,
+    bottom: 30,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#3d466dff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  floatingButtonText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 24,
+    width: '100%',
+    maxWidth: 320,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#f0f0f0',
+  },
+  saveButton: {
+    backgroundColor: '#3d466dff',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#666',
+  },
+  saveButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  detailHeader: {
+    backgroundColor: '#3d466dff',
+    paddingTop: 20,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  backButton: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  detailTitle: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    flex: 1,
+    textAlign: 'center',
+  },
+  detailContent: {
+    flex: 1,
+    padding: 20,
+  },
+  weightRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    backgroundColor: '#fff',
+    padding: 12,
+    borderRadius: 8,
+  },
+  categoryLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    width: 40,
+  },
+  weightInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 16,
+    width: 60,
+    textAlign: 'center',
+    marginLeft: 10,
+  },
+  percentText: {
+    fontSize: 16,
+    marginLeft: 8,
+    color: '#666',
+  },
+  assignmentsSection: {
+    marginTop: 20,
+  },
+  assignmentItem: {
+    backgroundColor: '#fff',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  assignmentName: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  categorySection: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  categoryHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  categoryTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  categoryGradeChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  categoryGradeText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  noAssignmentsText: {
+    fontSize: 14,
+    color: '#999',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    paddingVertical: 12,
+  },
+  assignmentGrade: {
+    fontSize: 14,
+    color: '#666',
+  },
+  addAssignmentButton: {
+    backgroundColor: '#3d466dff',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  addAssignmentText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  gradeRow: {
+    flexDirection: 'row',
+  },
+  categorySelectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+    color: '#333',
+  },
+  categoryButtons: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 16,
+  },
+  categoryButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    backgroundColor: '#f0f0f0',
+    alignItems: 'center',
+  },
+  categoryButtonSelected: {
+    backgroundColor: '#3d466dff',
+  },
+  categoryButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#666',
+  },
+  categoryButtonTextSelected: {
+    color: '#fff',
+  },
+
+  welcomeContainer: {
+    flex: 1,
+    backgroundColor: '#667eea',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  welcomeContent: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 30,
+    width: '100%',
+    maxWidth: 350,
+    alignItems: 'center',
+  },
+  welcomeTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  welcomeSubtitle: {
+    fontSize: 18,
+    color: '#666',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  welcomeText: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 20,
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  welcomeInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    fontSize: 16,
+    width: '100%',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  dateHelper: {
+    fontSize: 12,
+    color: '#999',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  welcomeButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+    marginBottom: 20,
+  },
+  welcomeBackButton: {
+    flex: 1,
+    backgroundColor: '#f0f0f0',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  welcomeNextButton: {
+    flex: 1,
+    backgroundColor: '#667eea',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  welcomeBackButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#666',
+  },
+  welcomeNextButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  welcomeProgress: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  welcomeProgressText: {
+    fontSize: 12,
+    color: '#999',
+    marginBottom: 8,
+  },
+  welcomeProgressBar: {
+    width: '60%',
+    height: 6,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  welcomeProgressFill: {
+    height: '100%',
+    backgroundColor: '#667eea',
+    borderRadius: 3,
+  },
+
+  fabOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.3)',
+  justifyContent: 'flex-end',
+  alignItems: 'flex-end',
+},
+
+  fabOptions: {
+    marginRight: 20,
+    marginBottom: 80,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    paddingVertical: 10,
+    width: 180,
+    elevation: 5,
+  },
+
+  fabOptionButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+
+  fabOptionText: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '600',
+  },
+
+});
+>>>>>>> 49316ea181f237b4547a40b3f947281a964588e7
